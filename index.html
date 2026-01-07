@@ -19,6 +19,7 @@ body{
   font-family:-apple-system,BlinkMacSystemFont,sans-serif;
   background:var(--bg);
   color:var(--dark);
+  padding-bottom:80px;
 }
 
 header{
@@ -30,11 +31,10 @@ header{
   font-weight:600;
 }
 
-/* SCREENS */
 .screen{display:none}
 .screen.active{display:block}
 
-/* CATALOG */
+/* PRODUCTS */
 .products{
   display:grid;
   grid-template-columns:repeat(2,1fr);
@@ -55,70 +55,53 @@ header{
   object-fit:cover;
 }
 
-.card-body{
-  padding:10px;
-}
-
-.card-body h4{
-  margin:0;
-  font-size:15px;
-}
+.card-body{padding:10px}
 
 .price{
-  margin-top:6px;
   color:var(--primary);
   font-weight:600;
 }
 
-/* BUTTONS */
+/* BUTTON */
 button{
-  width:100%;
-  padding:14px;
   border:none;
   border-radius:18px;
   background:var(--primary);
   color:#fff;
-  font-size:16px;
-  margin-top:12px;
-}
-
-/* PRODUCT SCREEN */
-.product-img{
+  padding:14px;
   width:100%;
-  height:220px;
-  object-fit:cover;
+  font-size:16px;
 }
 
-.product-content{
-  padding:16px;
-}
-
-.qty{
-  display:flex;
-  gap:10px;
-  align-items:center;
-  margin-top:10px;
-}
-
-.qty button{
-  width:40px;
-  height:40px;
-  border-radius:12px;
-  padding:0;
-}
-
-/* CART */
-.cart-item{
+/* CATEGORY */
+.category{
   background:#fff;
-  margin:10px;
-  padding:12px;
+  margin:12px;
+  padding:16px;
   border-radius:16px;
   box-shadow:0 6px 18px rgba(0,0,0,.07);
 }
 
-.cart-item h4{margin:0}
-.cart-total{
-  padding:16px;
+/* BOTTOM NAV */
+.bottom-nav{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:#fff;
+  display:flex;
+  border-top:1px solid #ddd;
+}
+
+.bottom-nav button{
+  flex:1;
+  background:none;
+  color:#555;
+  font-size:14px;
+}
+
+.bottom-nav button.active{
+  color:var(--primary);
   font-weight:600;
 }
 </style>
@@ -128,128 +111,87 @@ button{
 
 <header id="header">🍽 Premium Food</header>
 
-<!-- CATALOG -->
+<!-- SCREENS -->
+
 <div id="catalog" class="screen active">
+  <button onclick="show('categories')" style="margin:12px">Категории</button>
   <div class="products" id="products"></div>
 </div>
 
-<!-- PRODUCT -->
-<div id="product" class="screen">
-  <img id="pImg" class="product-img">
-  <div class="product-content">
-    <h2 id="pName"></h2>
-    <p id="pDesc"></p>
-    <p class="price" id="pPrice"></p>
-
-    <div class="qty">
-      <button onclick="changeQty(-1)">−</button>
-      <span id="qty">1</span>
-      <button onclick="changeQty(1)">+</button>
-    </div>
-
-    <button onclick="addToCart()">Добавить в корзину</button>
-    <button onclick="goCatalog()" style="background:#ccc;color:#000">Назад</button>
-  </div>
+<div id="categories" class="screen">
+  <div class="category" onclick="filterCategory('all')">Все</div>
+  <div class="category" onclick="filterCategory('burgers')">Бургеры</div>
+  <div class="category" onclick="filterCategory('pizza')">Пицца</div>
+  <div class="category" onclick="filterCategory('drinks')">Напитки</div>
+  <div class="category" onclick="filterCategory('desserts')">Десерты</div>
+  <button onclick="show('catalog')" style="margin:12px;background:#ccc;color:#000">Назад</button>
 </div>
 
-<!-- CART -->
+<div id="favorites" class="screen">
+  <p style="padding:16px">❤️ Избранные (будет на этапе 2)</p>
+</div>
+
 <div id="cart" class="screen">
-  <div id="cartItems"></div>
-  <div class="cart-total" id="cartTotal"></div>
-  <button onclick="checkout()">Оформить заказ</button>
-  <button onclick="goCatalog()" style="background:#ccc;color:#000">Назад</button>
+  <p style="padding:16px">🛒 Корзина (уже есть, доработаем)</p>
+</div>
+
+<div id="profile" class="screen">
+  <p style="padding:16px">👤 Профиль</p>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button id="nav-home" class="active" onclick="nav('catalog')">Главная</button>
+  <button id="nav-fav" onclick="nav('favorites')">Избранные</button>
+  <button id="nav-cart" onclick="nav('cart')">Корзина</button>
+  <button id="nav-profile" onclick="nav('profile')">Профиль</button>
 </div>
 
 <script>
 const tg = Telegram.WebApp;
 tg.expand();
 
-const products = Array.from({length:50},(_,i)=>({
-  id:i,
-  name:`Блюдо ${i+1}`,
-  desc:`Премиум блюдо №${i+1}, свежие ингредиенты.`,
-  price:30000 + i*1500,
-  img:`https://picsum.photos/400/300?food=${i}`
-}));
-
-let currentProduct = null;
-let quantity = 1;
-let cart = [];
-
-const screens = {
-  catalog:document.getElementById("catalog"),
-  product:document.getElementById("product"),
-  cart:document.getElementById("cart")
-};
-
-function show(name){
-  Object.values(screens).forEach(s=>s.classList.remove("active"));
-  screens[name].classList.add("active");
-  document.getElementById("header").innerText =
-    name==="catalog"?"🍽 Premium Food":
-    name==="cart"?"🛒 Корзина":"🍽 Детали";
-}
-
-function goCatalog(){show("catalog")}
-function goCart(){renderCart();show("cart")}
+const productsData = [
+  {id:1,name:"Бургер",price:45000,cat:"burgers",img:"https://picsum.photos/300?1"},
+  {id:2,name:"Пицца",price:60000,cat:"pizza",img:"https://picsum.photos/300?2"},
+  {id:3,name:"Кола",price:15000,cat:"drinks",img:"https://picsum.photos/300?3"},
+  {id:4,name:"Торт",price:30000,cat:"desserts",img:"https://picsum.photos/300?4"}
+];
 
 const productsBox = document.getElementById("products");
-products.forEach(p=>{
-  productsBox.innerHTML += `
-    <div class="card" onclick="openProduct(${p.id})">
-      <img src="${p.img}">
-      <div class="card-body">
-        <h4>${p.name}</h4>
-        <div class="price">${p.price} сум</div>
-      </div>
-    </div>
-  `;
-});
 
-function openProduct(id){
-  currentProduct = products.find(p=>p.id===id);
-  quantity = 1;
-  document.getElementById("qty").innerText = quantity;
-  pImg.src = currentProduct.img;
-  pName.innerText = currentProduct.name;
-  pDesc.innerText = currentProduct.desc;
-  pPrice.innerText = currentProduct.price + " сум";
-  show("product");
-}
-
-function changeQty(v){
-  quantity = Math.max(1, quantity+v);
-  document.getElementById("qty").innerText = quantity;
-}
-
-function addToCart(){
-  const item = cart.find(i=>i.id===currentProduct.id);
-  if(item) item.qty += quantity;
-  else cart.push({...currentProduct, qty:quantity});
-  goCart();
-}
-
-function renderCart(){
-  const box = document.getElementById("cartItems");
-  box.innerHTML = "";
-  let total = 0;
-
-  cart.forEach(i=>{
-    total += i.price * i.qty;
-    box.innerHTML += `
-      <div class="cart-item">
-        <h4>${i.name}</h4>
-        <p>${i.qty} × ${i.price} сум</p>
-      </div>
-    `;
+function renderProducts(list){
+  productsBox.innerHTML="";
+  list.forEach(p=>{
+    productsBox.innerHTML+=`
+      <div class="card">
+        <img src="${p.img}">
+        <div class="card-body">
+          <h4>${p.name}</h4>
+          <div class="price">${p.price} сум</div>
+        </div>
+      </div>`;
   });
-
-  cartTotal.innerText = "Итого: " + total + " сум";
 }
 
-function checkout(){
-  tg.sendData(JSON.stringify(cart));
-  tg.close();
+renderProducts(productsData);
+
+function show(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+function nav(id){
+  show(id);
+  document.querySelectorAll(".bottom-nav button").forEach(b=>b.classList.remove("active"));
+  document.getElementById("nav-"+(id==="catalog"?"home":id)).classList.add("active");
+}
+
+function filterCategory(cat){
+  show("catalog");
+  nav("catalog");
+  if(cat==="all") renderProducts(productsData);
+  else renderProducts(productsData.filter(p=>p.cat===cat));
 }
 </script>
 
