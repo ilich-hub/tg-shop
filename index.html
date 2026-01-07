@@ -312,25 +312,30 @@ function renderProducts(){
 
 /* RENDER FAVORITES */
 function renderFavorites(){
- const box=document.getElementById("favProducts");
- box.innerHTML="";
+  const box = document.getElementById("favProducts");
+  if(!box) return; // 🔥 КРИТИЧНО
 
- if(favorites.length===0){
-   box.innerHTML="<p style='padding:20px'>Нет избранных товаров</p>";
-   return;
- }
+  box.innerHTML="";
 
- data.filter(p=>favorites.includes(p.id)).forEach(p=>{
-  box.innerHTML+=`
-   <div class="card">
-     <div class="fav active" onclick="toggleFav(${p.id})">❤️</div>
-     <div class="content" onclick="openProduct(${p.id})">
-       <img src="${p.img}">
-       <h4>${p.name}</h4>
-       <span>${p.price} сум</span>
-     </div>
-   </div>`;
- });
+  if(favorites.length === 0){
+    box.innerHTML = "<p style='padding:20px'>Нет избранных товаров</p>";
+    return;
+  }
+
+  data.forEach(p=>{
+    if(favorites.includes(p.id)){
+      box.innerHTML += `
+        <div class="card">
+          <div class="fav active" onclick="toggleFav(${p.id})">❤️</div>
+          <div class="content" onclick="openProduct(${p.id})">
+            <img src="${p.img}">
+            <h4>${p.name}</h4>
+            <span>${p.price} сум</span>
+          </div>
+        </div>
+      `;
+    }
+  });
 }
 
 /* LOGIC */
@@ -352,7 +357,6 @@ function toggleFav(id){
 
  localStorage.setItem("favorites",JSON.stringify(favorites));
  renderProducts();
- renderFavorites();
 }
 
 function openProduct(id){
@@ -397,16 +401,18 @@ function show(id){
 }
 
 function nav(id){
-  show(id);
+  // сначала показываем экран
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
 
   // активная кнопка
   document.querySelectorAll(".bottom-nav button")
-    .forEach(b => b.classList.remove("active"));
+    .forEach(b=>b.classList.remove("active"));
 
   document.getElementById("nav-"+(id==="favorites"?"fav":id))
     .classList.add("active");
 
-  // 🔥 ШАГ 4 — ПЕРЕРИСОВКА ЭКРАНОВ
+  // 🔥 РЕНДЕР ТОЛЬКО ПОСЛЕ ПОКАЗА
   if(id === "favorites"){
     renderFavorites();
   }
@@ -418,7 +424,6 @@ function nav(id){
 
 /* INIT */
 renderProducts();
-renderFavorites();
 </script>
 
 </body>
