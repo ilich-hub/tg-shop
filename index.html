@@ -39,8 +39,11 @@ body{
 }
 
   #cart{
-  display:flex;
   flex-direction:column;
+}
+
+#cart.active{
+  display:flex;
 }
   
 @keyframes fade{
@@ -191,6 +194,10 @@ body{
   align-items:center;
 }
 .bottom-nav button.active{color:var(--accent)}
+  #favorites,
+#cart{
+  background:linear-gradient(180deg,var(--bg1),var(--bg2));
+}
 </style>
 </head>
 
@@ -283,24 +290,27 @@ categories.forEach(c=>{
 
 /* RENDER PRODUCTS */
 function renderProducts(){
- const box=document.getElementById("products");
- const q=document.getElementById("searchInput").value.toLowerCase();
- box.innerHTML="";
+  const box = document.getElementById("products");
+  const q = document.getElementById("searchInput").value.toLowerCase();
+  box.innerHTML = "";
 
- data.filter(p=>{
-   return (activeCategory==="Все"||p.cat===activeCategory) &&
-          p.name.toLowerCase().includes(q);
- }).forEach(p=>{
-   box.innerHTML+=`
-    <div class="card">
-      <div class="fav ${favorites.includes(p.id)?"active":""}"
- onclick="toggleFav(${p.id}, event)">❤️</div>
-        <img src="${p.img}">
-        <h4>${p.name}</h4>
-        <span>${p.price} сум</span>
+  data.filter(p=>{
+    return (activeCategory==="Все" || p.cat===activeCategory) &&
+           p.name.toLowerCase().includes(q);
+  }).forEach(p=>{
+    box.innerHTML += `
+      <div class="card">
+        <div class="fav ${favorites.includes(p.id) ? "active" : ""}"
+          onclick="toggleFav(${p.id}, event)">❤️</div>
+
+        <div class="content" onclick="openProduct(${p.id})">
+          <img src="${p.img}">
+          <h4>${p.name}</h4>
+          <span>${p.price} сум</span>
+        </div>
       </div>
-    </div>`;
- });
+    `;
+  });
 }
 
 /* RENDER FAVORITES */
@@ -347,15 +357,17 @@ function selectCategory(c,el){
  renderProducts();
 }
 
-function toggleFav(id){
- favorites = favorites.includes(id)
-   ? favorites.filter(x=>x!==id)
-   : [...favorites,id];
+function toggleFav(id, e){
+  if(e) e.stopPropagation();
 
- localStorage.setItem("favorites", JSON.stringify(favorites));
+  favorites = favorites.includes(id)
+    ? favorites.filter(x => x !== id)
+    : [...favorites, id];
 
- renderProducts();
- renderFavorites(); // ← ВАЖНО
+  localStorage.setItem("favorites", JSON.stringify(favorites));
+
+  renderProducts();
+  renderFavorites();
 }
 
 function openProduct(id){
