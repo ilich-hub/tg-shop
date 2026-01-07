@@ -22,15 +22,16 @@ body{
   margin:0;
   font-family:'Inter',sans-serif;
   background:#fff;
+  height:100vh;
+  overflow:hidden; /* 🔥 КЛЮЧ */
 }
 
 .screen{
   display:none;
-  height:100vh;              /* ⬅ фиксированная высота */
+  height:calc(100vh - 70px); /* ⬅ высота без нижнего меню */
   background:linear-gradient(180deg,var(--bg1),var(--bg2));
-  animation:fade .25s ease;
-  padding-bottom:90px;       /* ⬅ место под нижнее меню */
-  overflow-y:auto;           /* ⬅ скролл внутри экрана */
+  overflow-y:auto;           /* ⬅ скролл ТОЛЬКО здесь */
+  padding-bottom:20px;
 }
 
 .screen.active{
