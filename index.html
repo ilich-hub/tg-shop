@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Магазин</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body { font-family: Arial; background: #f5f5f5; margin: 0; }
+    h1 { text-align: center; }
+    .product {
+      background: white;
+      margin: 10px;
+      padding: 10px;
+      border-radius: 10px;
+    }
+    img { width: 100%; border-radius: 10px; }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #2a9df4;
+      color: white;
+      border: none;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>🛒 Магазин</h1>
+
+  <div class="product">
+    <img src="https://picsum.photos/300/200?1">
+    <h3>Товар 1</h3>
+    <p>Цена: 50 000 сум</p>
+    <button onclick="order('Товар 1')">Заказать</button>
+  </div>
+
+  <div class="product">
+    <img src="https://picsum.photos/300/200?2">
+    <h3>Товар 2</h3>
+    <p>Цена: 80 000 сум</p>
+    <button onclick="order('Товар 2')">Заказать</button>
+  </div>
+
+  <script>
+    function order(product) {
+      Telegram.WebApp.sendData(product);
+      Telegram.WebApp.close();
+    }
+  </script>
+</body>
+</html>
