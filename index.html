@@ -145,9 +145,9 @@ body{
 
 <!-- NAV -->
 <div class="bottom-nav">
-  <button class="active" onclick="nav('home')">🏠<div>Главная</div></button>
-  <button onclick="nav('cart')">🛒<div>Корзина</div></button>
-  <button onclick="nav('profile')">👤<div>Профиль</div></button>
+  <button id="nav-home" class="active" onclick="nav('home')">🏠<div>Главная</div></button>
+  <button id="nav-cart" onclick="nav('cart')">🛒<div>Корзина</div></button>
+  <button id="nav-profile" onclick="nav('profile')">👤<div>Профиль</div></button>
 </div>
 
 <script>
@@ -178,9 +178,11 @@ function show(id){
 }
 
 function nav(id){
- show(id);
- document.querySelectorAll(".bottom-nav button").forEach(b=>b.classList.remove("active"));
- event.currentTarget.classList.add("active");
+  show(id);
+  document.querySelectorAll(".bottom-nav button").forEach(b=>{
+    b.classList.remove("active");
+  });
+  document.getElementById("nav-"+id).classList.add("active");
 }
 
 function openProduct(id){
@@ -198,9 +200,9 @@ function changeQty(v){
 }
 
 function addToCart(){
- cart.push({...current,qty});
- nav('cart');
- renderCart();
+  cart.push({...current,qty});
+  renderCart();
+  nav('cart');
 }
 
 function renderCart(){
