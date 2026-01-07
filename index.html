@@ -299,9 +299,7 @@ function renderProducts(){
    box.innerHTML+=`
     <div class="card">
       <div class="fav ${favorites.includes(p.id)?"active":""}"
-        onclick="toggleFav(${p.id})">❤️</div>
-
-      <div class="content" onclick="openProduct(${p.id})">
+ onclick="event.stopPropagation(); toggleFav(${p.id})">❤️</div>
         <img src="${p.img}">
         <h4>${p.name}</h4>
         <span>${p.price} сум</span>
@@ -326,11 +324,11 @@ function renderFavorites(){
     if(favorites.includes(p.id)){
       box.innerHTML += `
         <div class="card">
-          <div class="fav active" onclick="toggleFav(${p.id})">❤️</div>
-          <div class="content" onclick="openProduct(${p.id})">
+          <div class="fav ${favorites.includes(p.id)?"active":""}"
+ onclick="event.stopPropagation(); toggleFav(${p.id})">❤️</div>
             <img src="${p.img}">
             <h4>${p.name}</h4>
-            <span>${p.price} сум</span>
+            p.price.toLocaleString() + " сум"
           </div>
         </div>
       `;
@@ -340,7 +338,9 @@ function renderFavorites(){
 
 /* LOGIC */
 function toggleSearch(){
- searchBox.style.display=searchBox.style.display==="block"?"none":"block";
+  const searchBox = document.getElementById("searchBox");
+  searchBox.style.display =
+    searchBox.style.display === "block" ? "none" : "block";
 }
 
 function selectCategory(c,el){
@@ -355,8 +355,10 @@ function toggleFav(id){
    ? favorites.filter(x=>x!==id)
    : [...favorites,id];
 
- localStorage.setItem("favorites",JSON.stringify(favorites));
+ localStorage.setItem("favorites", JSON.stringify(favorites));
+
  renderProducts();
+ renderFavorites(); // ← ВАЖНО
 }
 
 function openProduct(id){
@@ -375,9 +377,14 @@ function changeQty(v){
 }
 
 function addToCart(){
- cart.push({...current,qty});
- renderCart();
- nav("cart");
+  const item = cart.find(i => i.id === current.id);
+  if(item){
+    item.qty += qty;
+  } else {
+    cart.push({...current, qty});
+  }
+  renderCart();
+  nav("cart");
 }
 
 function renderCart(){
