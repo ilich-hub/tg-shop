@@ -26,10 +26,11 @@ body{
 
 .screen{
   display:none;
-  min-height:100vh;
+  height:100vh;              /* ⬅ фиксированная высота */
   background:linear-gradient(180deg,var(--bg1),var(--bg2));
   animation:fade .25s ease;
-  padding-bottom:90px;
+  padding-bottom:90px;       /* ⬅ место под нижнее меню */
+  overflow-y:auto;           /* ⬅ скролл внутри экрана */
 }
 
 .screen.active{
