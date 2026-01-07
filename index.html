@@ -8,78 +8,134 @@
 <style>
 :root{
   --primary:#8b1d1d;
-  --bg:#f4f4f4;
-  --dark:#111;
+  --bg:#f5f5f5;
+  --card:#ffffff;
+  --text:#111;
+  --muted:#777;
 }
 
 *{box-sizing:border-box}
 
 body{
   margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   background:var(--bg);
-  color:var(--dark);
-  padding-bottom:80px;
+  color:var(--text);
+  padding-bottom:70px; /* место под нижнее меню */
 }
 
+/* HEADER */
 header{
   background:var(--primary);
   color:#fff;
-  padding:16px;
+  padding:14px;
   text-align:center;
-  font-size:20px;
+  font-size:18px;
   font-weight:600;
 }
 
+/* SCREENS */
 .screen{display:none}
 .screen.active{display:block}
 
-/* PRODUCTS */
+/* BUTTONS */
+.btn{
+  background:var(--primary);
+  color:#fff;
+  border:none;
+  border-radius:22px;
+  padding:14px;
+  font-size:16px;
+  width:100%;
+}
+
+/* PRODUCTS GRID */
 .products{
   display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:12px;
-  padding:12px;
+  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:14px;
+  padding:14px;
 }
 
 .card{
-  background:#fff;
-  border-radius:18px;
+  background:var(--card);
+  border-radius:20px;
   overflow:hidden;
-  box-shadow:0 8px 24px rgba(0,0,0,.08);
+  box-shadow:0 8px 22px rgba(0,0,0,.08);
+  cursor:pointer;
 }
 
 .card img{
   width:100%;
-  height:120px;
+  height:130px;
   object-fit:cover;
 }
 
-.card-body{padding:10px}
+.card-body{
+  padding:12px;
+}
+
+.card-body h4{
+  margin:0;
+  font-size:15px;
+}
 
 .price{
+  margin-top:6px;
   color:var(--primary);
   font-weight:600;
 }
 
-/* BUTTON */
-button{
-  border:none;
+/* CATEGORY */
+.category{
+  background:var(--card);
+  margin:14px;
+  padding:18px;
   border-radius:18px;
-  background:var(--primary);
-  color:#fff;
-  padding:14px;
-  width:100%;
+  box-shadow:0 6px 18px rgba(0,0,0,.07);
   font-size:16px;
 }
 
-/* CATEGORY */
-.category{
-  background:#fff;
-  margin:12px;
+/* PRODUCT SCREEN */
+.product-img{
+  width:100%;
+  height:240px;
+  object-fit:cover;
+}
+
+.product-content{
   padding:16px;
-  border-radius:16px;
+}
+
+.qty{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin:12px 0;
+}
+
+.qty button{
+  width:42px;
+  height:42px;
+  border-radius:14px;
+  border:none;
+  background:var(--primary);
+  color:#fff;
+  font-size:18px;
+}
+
+/* CART */
+.cart-item{
+  background:var(--card);
+  margin:12px;
+  padding:14px;
+  border-radius:18px;
   box-shadow:0 6px 18px rgba(0,0,0,.07);
+}
+
+.cart-total{
+  padding:16px;
+  font-weight:600;
 }
 
 /* BOTTOM NAV */
@@ -88,6 +144,7 @@ button{
   bottom:0;
   left:0;
   right:0;
+  height:60px;
   background:#fff;
   display:flex;
   border-top:1px solid #ddd;
@@ -95,9 +152,10 @@ button{
 
 .bottom-nav button{
   flex:1;
+  border:none;
   background:none;
-  color:#555;
-  font-size:14px;
+  font-size:13px;
+  color:var(--muted);
 }
 
 .bottom-nav button.active{
@@ -111,38 +169,63 @@ button{
 
 <header id="header">🍽 Premium Food</header>
 
-<!-- SCREENS -->
-
+<!-- CATALOG -->
 <div id="catalog" class="screen active">
-  <button onclick="show('categories')" style="margin:12px">Категории</button>
+  <div style="padding:14px">
+    <button class="btn" onclick="showScreen('categories')">Категории</button>
+  </div>
   <div class="products" id="products"></div>
 </div>
 
+<!-- PRODUCT -->
+<div id="product" class="screen">
+  <img id="pImg" class="product-img">
+  <div class="product-content">
+    <h2 id="pName"></h2>
+    <p id="pDesc"></p>
+    <div class="price" id="pPrice"></div>
+
+    <div class="qty">
+      <button onclick="changeQty(-1)">−</button>
+      <span id="qty">1</span>
+      <button onclick="changeQty(1)">+</button>
+    </div>
+
+    <button class="btn" onclick="addToCart()">Добавить в корзину</button>
+    <button class="btn" style="background:#ccc;color:#000;margin-top:10px" onclick="showScreen('catalog')">Назад</button>
+  </div>
+</div>
+
+<!-- CATEGORIES -->
 <div id="categories" class="screen">
   <div class="category" onclick="filterCategory('all')">Все</div>
   <div class="category" onclick="filterCategory('burgers')">Бургеры</div>
   <div class="category" onclick="filterCategory('pizza')">Пицца</div>
   <div class="category" onclick="filterCategory('drinks')">Напитки</div>
   <div class="category" onclick="filterCategory('desserts')">Десерты</div>
-  <button onclick="show('catalog')" style="margin:12px;background:#ccc;color:#000">Назад</button>
 </div>
 
+<!-- FAVORITES -->
 <div id="favorites" class="screen">
-  <p style="padding:16px">❤️ Избранные (будет на этапе 2)</p>
+  <p style="padding:16px">❤️ Избранные (этап 2)</p>
 </div>
 
+<!-- CART -->
 <div id="cart" class="screen">
-  <p style="padding:16px">🛒 Корзина (уже есть, доработаем)</p>
+  <div id="cartItems"></div>
+  <div class="cart-total" id="cartTotal"></div>
+  <button class="btn" onclick="checkout()" style="margin:14px">Оформить заказ</button>
 </div>
 
+<!-- PROFILE -->
 <div id="profile" class="screen">
-  <p style="padding:16px">👤 Профиль</p>
+  <p style="padding:16px">👤 Профиль пользователя</p>
 </div>
 
 <!-- BOTTOM NAV -->
 <div class="bottom-nav">
-  <button id="nav-home" class="active" onclick="nav('catalog')">Главная</button>
-  <button id="nav-fav" onclick="nav('favorites')">Избранные</button>
+  <button id="nav-catalog" class="active" onclick="nav('catalog')">Главная</button>
+  <button id="nav-favorites" onclick="nav('favorites')">Избранные</button>
   <button id="nav-cart" onclick="nav('cart')">Корзина</button>
   <button id="nav-profile" onclick="nav('profile')">Профиль</button>
 </div>
@@ -151,20 +234,32 @@ button{
 const tg = Telegram.WebApp;
 tg.expand();
 
+/* DATA */
 const productsData = [
-  {id:1,name:"Бургер",price:45000,cat:"burgers",img:"https://picsum.photos/300?1"},
-  {id:2,name:"Пицца",price:60000,cat:"pizza",img:"https://picsum.photos/300?2"},
-  {id:3,name:"Кола",price:15000,cat:"drinks",img:"https://picsum.photos/300?3"},
-  {id:4,name:"Торт",price:30000,cat:"desserts",img:"https://picsum.photos/300?4"}
+  {id:1,name:"Бургер",price:45000,cat:"burgers",desc:"Сочный бургер",img:"https://picsum.photos/400?1"},
+  {id:2,name:"Пицца",price:60000,cat:"pizza",desc:"Итальянская пицца",img:"https://picsum.photos/400?2"},
+  {id:3,name:"Кола",price:15000,cat:"drinks",desc:"Холодный напиток",img:"https://picsum.photos/400?3"},
+  {id:4,name:"Торт",price:30000,cat:"desserts",desc:"Сладкий десерт",img:"https://picsum.photos/400?4"},
+  {id:5,name:"Чизбургер",price:48000,cat:"burgers",desc:"С сыром",img:"https://picsum.photos/400?5"},
+  {id:6,name:"Пепперони",price:65000,cat:"pizza",desc:"Острая пицца",img:"https://picsum.photos/400?6"},
+  {id:7,name:"Сок",price:12000,cat:"drinks",desc:"Натуральный",img:"https://picsum.photos/400?7"},
+  {id:8,name:"Мороженое",price:20000,cat:"desserts",desc:"Ванильное",img:"https://picsum.photos/400?8"},
+  {id:9,name:"Бургер BBQ",price:52000,cat:"burgers",desc:"С соусом BBQ",img:"https://picsum.photos/400?9"},
+  {id:10,name:"Маргарита",price:58000,cat:"pizza",desc:"Классика",img:"https://picsum.photos/400?10"}
 ];
 
-const productsBox = document.getElementById("products");
+let currentProduct=null;
+let quantity=1;
+let cart=[];
+
+/* RENDER */
+const productsBox=document.getElementById("products");
 
 function renderProducts(list){
   productsBox.innerHTML="";
   list.forEach(p=>{
     productsBox.innerHTML+=`
-      <div class="card">
+      <div class="card" onclick="openProduct(${p.id})">
         <img src="${p.img}">
         <div class="card-body">
           <h4>${p.name}</h4>
@@ -173,22 +268,69 @@ function renderProducts(list){
       </div>`;
   });
 }
-
 renderProducts(productsData);
 
-function show(id){
+/* SCREENS */
+function showScreen(id){
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 }
 
+/* NAV */
 function nav(id){
-  show(id);
+  showScreen(id);
   document.querySelectorAll(".bottom-nav button").forEach(b=>b.classList.remove("active"));
-  document.getElementById("nav-"+(id==="catalog"?"home":id)).classList.add("active");
+  document.getElementById("nav-"+id).classList.add("active");
 }
 
+/* PRODUCT */
+function openProduct(id){
+  currentProduct=productsData.find(p=>p.id===id);
+  quantity=1;
+  qty.innerText=quantity;
+  pImg.src=currentProduct.img;
+  pName.innerText=currentProduct.name;
+  pDesc.innerText=currentProduct.desc;
+  pPrice.innerText=currentProduct.price+" сум";
+  showScreen("product");
+}
+
+function changeQty(v){
+  quantity=Math.max(1,quantity+v);
+  qty.innerText=quantity;
+}
+
+function addToCart(){
+  const item=cart.find(i=>i.id===currentProduct.id);
+  if(item) item.qty+=quantity;
+  else cart.push({...currentProduct,qty:quantity});
+  nav("cart");
+  renderCart();
+}
+
+/* CART */
+function renderCart(){
+  cartItems.innerHTML="";
+  let total=0;
+  cart.forEach(i=>{
+    total+=i.price*i.qty;
+    cartItems.innerHTML+=`
+      <div class="cart-item">
+        <h4>${i.name}</h4>
+        <p>${i.qty} × ${i.price} сум</p>
+      </div>`;
+  });
+  cartTotal.innerText="Итого: "+total+" сум";
+}
+
+function checkout(){
+  tg.sendData(JSON.stringify(cart));
+  tg.close();
+}
+
+/* CATEGORY */
 function filterCategory(cat){
-  show("catalog");
+  showScreen("catalog");
   nav("catalog");
   if(cat==="all") renderProducts(productsData);
   else renderProducts(productsData.filter(p=>p.cat===cat));
