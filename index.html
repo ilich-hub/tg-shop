@@ -300,7 +300,6 @@ function toggleFav(id){
     favorites.push(id);
   }
 
-  // 💾 СОХРАНЕНИЕ
   localStorage.setItem("favorites", JSON.stringify(favorites));
 
   renderProducts();
