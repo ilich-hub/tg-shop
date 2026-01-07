@@ -261,21 +261,28 @@ const data=[
  {id:5,name:"Яблоко",price:40000,cat:"Фрукты",img:"https://pngimg.com/uploads/apple/apple_PNG12405.png"}
 ];
 
-let current=null,qty=1,cart=[],favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+let current=null;
+let qty=1;
+let cart=[];
+let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
 let activeCategory="Все";
 
-/* CHIPS */
+/* CATEGORIES */
 const chipsBox=document.getElementById("chips");
 categories.forEach(c=>{
-  chipsBox.innerHTML+=`
-   <div class="chip ${c==="Все"?"active":""}" onclick="selectCategory('${c}')">${c}</div>`;
+  const el=document.createElement("div");
+  el.className="chip"+(c==="Все"?" active":"");
+  el.innerText=c;
+  el.onclick=()=>selectCategory(c,el);
+  chipsBox.appendChild(el);
 });
 
-/* RENDER */
+/* RENDER PRODUCTS */
 function renderProducts(){
  const box=document.getElementById("products");
  const q=document.getElementById("searchInput").value.toLowerCase();
  box.innerHTML="";
+
  data.filter(p=>{
    return (activeCategory==="Все"||p.cat===activeCategory) &&
           p.name.toLowerCase().includes(q);
@@ -283,43 +290,60 @@ function renderProducts(){
    box.innerHTML+=`
     <div class="card">
       <div class="fav ${favorites.includes(p.id)?"active":""}"
-  onclick="toggleFav(${p.id})">❤️</div>
-      <div class="content" onclick="openProduct(${p.id})">
-  <img src="${p.img}">
-  <h4>${p.name}</h4>
-  <span>${p.price} сум</span>
-</div>
+        onclick="toggleFav(${p.id})">❤️</div>
 
-    </div>
-    `;
+      <div class="content" onclick="openProduct(${p.id})">
+        <img src="${p.img}">
+        <h4>${p.name}</h4>
+        <span>${p.price} сум</span>
+      </div>
+    </div>`;
  });
 }
 
-renderProducts();
+/* RENDER FAVORITES */
+function renderFavorites(){
+ const box=document.getElementById("favProducts");
+ box.innerHTML="";
+
+ if(favorites.length===0){
+   box.innerHTML="<p style='padding:20px'>Нет избранных товаров</p>";
+   return;
+ }
+
+ data.filter(p=>favorites.includes(p.id)).forEach(p=>{
+  box.innerHTML+=`
+   <div class="card">
+     <div class="fav active" onclick="toggleFav(${p.id})">❤️</div>
+     <div class="content" onclick="openProduct(${p.id})">
+       <img src="${p.img}">
+       <h4>${p.name}</h4>
+       <span>${p.price} сум</span>
+     </div>
+   </div>`;
+ });
+}
 
 /* LOGIC */
 function toggleSearch(){
  searchBox.style.display=searchBox.style.display==="block"?"none":"block";
 }
 
-function selectCategory(c){
+function selectCategory(c,el){
  activeCategory=c;
  document.querySelectorAll(".chip").forEach(x=>x.classList.remove("active"));
- event.target.classList.add("active");
+ el.classList.add("active");
  renderProducts();
 }
 
 function toggleFav(id){
-  if(favorites.includes(id)){
-    favorites = favorites.filter(x => x !== id);
-  } else {
-    favorites.push(id);
-  }
+ favorites = favorites.includes(id)
+   ? favorites.filter(x=>x!==id)
+   : [...favorites,id];
 
-  localStorage.setItem("favorites", JSON.stringify(favorites));
-
-  renderProducts();
-  renderFavorites();
+ localStorage.setItem("favorites",JSON.stringify(favorites));
+ renderProducts();
+ renderFavorites();
 }
 
 function openProduct(id){
@@ -339,8 +363,8 @@ function changeQty(v){
 
 function addToCart(){
  cart.push({...current,qty});
- nav("cart");
  renderCart();
+ nav("cart");
 }
 
 function renderCart(){
@@ -354,19 +378,6 @@ function renderCart(){
  cartTotal.innerText="Итого: "+total+" сум";
 }
 
-function renderFavorites(){
- const box=document.getElementById("favProducts");
- box.innerHTML="";
- data.filter(p=>favorites.includes(p.id)).forEach(p=>{
-  box.innerHTML+=`
-   <div class="card" onclick="openProduct(${p.id})">
-    <img src="${p.img}">
-    <h4>${p.name}</h4>
-    <span>${p.price} сум</span>
-   </div>`;
- });
-}
-
 function preparePayment(){
  alert("Оплата будет подключена через Telegram Payments");
 }
@@ -377,24 +388,15 @@ function show(id){
 }
 
 function nav(id){
-  show(id);
+ show(id);
+ document.querySelectorAll(".bottom-nav button").forEach(b=>b.classList.remove("active"));
+ document.getElementById("nav-"+(id==="favorites"?"fav":id)).classList.add("active");
 
-  // активная кнопка
-  document.querySelectorAll(".bottom-nav button")
-    .forEach(b => b.classList.remove("active"));
-
-  document.getElementById("nav-"+(id==="favorites"?"fav":id))
-    .classList.add("active");
-
-  // 🔥 ВАЖНО: обновляем экран
-  if(id === "favorites"){
-    renderFavorites();
-  }
-  if(id === "cart"){
-    renderCart();
-  }
+ if(id==="favorites") renderFavorites();
+ if(id==="cart") renderCart();
 }
-  // 🔄 первичная отрисовка
+
+/* INIT */
 renderProducts();
 renderFavorites();
 </script>
