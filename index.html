@@ -245,7 +245,7 @@ const data=[
  {id:5,name:"Яблоко",price:40000,cat:"Фрукты",img:"https://pngimg.com/uploads/apple/apple_PNG12405.png"}
 ];
 
-let current=null,qty=1,cart=[],
+let current=null,qty=1,cart=[],favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
 let activeCategory="Все";
 
 /* CHIPS */
@@ -367,7 +367,6 @@ function nav(id){
  document.getElementById("nav-"+(id==="favorites"?"fav":id)).classList.add("active");
 }
 </script>
-  let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
 
 </body>
 </html>
