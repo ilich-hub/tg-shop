@@ -198,6 +198,83 @@ body{
 #cart{
   background:linear-gradient(180deg,var(--bg1),var(--bg2));
 }
+  /* ===== MARKETPLACE SPACING ===== */
+
+/* единый контейнер */
+.products{
+  padding:16px;
+  gap:14px;
+}
+
+/* карточка */
+.card{
+  padding:14px;
+}
+
+/* изображения в карточках */
+.card img{
+  height:120px;
+}
+
+/* корзина */
+#cartItems{
+  padding:12px;
+}
+
+.cart-item{
+  margin:0 0 12px 0;
+}
+
+/* избранное */
+#favProducts{
+  padding:16px;
+}
+
+  .card{
+  animation:fadeUp .25s ease;
+}
+
+@keyframes fadeUp{
+  from{
+    opacity:0;
+    transform:translateY(8px);
+  }
+  to{
+    opacity:1;
+    transform:none;
+  }
+}
+  
+  .card:active{
+  transform:scale(0.98);
+  }
+
+  .fav{
+  transition:transform .15s ease, color .15s ease;
+}
+
+.fav:active{
+  transform:scale(1.3);
+}
+
+  .btn{
+  transition:opacity .15s ease, transform .15s ease;
+}
+
+.btn:active{
+  transform:scale(0.97);
+  opacity:0.9;
+}
+
+  .bottom-nav{
+  box-shadow:0 -4px 12px rgba(0,0,0,.05);
+}
+
+.bottom-nav button{
+  transition:color .2s ease;
+}
+
+  
 </style>
 </head>
 
@@ -306,7 +383,7 @@ function renderProducts(){
         <div class="content" onclick="openProduct(${p.id})">
           <img src="${p.img}">
           <h4>${p.name}</h4>
-          <span>${p.price} сум</span>
+          <span>${p.price.toLocaleString()} сум</span>
         </div>
       </div>
     `;
@@ -335,7 +412,7 @@ function renderFavorites(){
           <div class="content" onclick="openProduct(${p.id})">
             <img src="${p.img}">
             <h4>${p.name}</h4>
-            <span>${p.price} сум</span>
+            <span>${p.price.toLocaleString()} сум</span>
           </div>
         </div>
       `;
