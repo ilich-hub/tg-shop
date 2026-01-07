@@ -361,10 +361,26 @@ function show(id){
 }
 
 function nav(id){
- show(id);
- document.querySelectorAll(".bottom-nav button").forEach(b=>b.classList.remove("active"));
- document.getElementById("nav-"+(id==="favorites"?"fav":id)).classList.add("active");
+  show(id);
+
+  // активная кнопка
+  document.querySelectorAll(".bottom-nav button")
+    .forEach(b => b.classList.remove("active"));
+
+  document.getElementById("nav-"+(id==="favorites"?"fav":id))
+    .classList.add("active");
+
+  // 🔥 ВАЖНО: обновляем экран
+  if(id === "favorites"){
+    renderFavorites();
+  }
+  if(id === "cart"){
+    renderCart();
+  }
 }
+  // 🔄 первичная отрисовка
+renderProducts();
+renderFavorites();
 </script>
 
 </body>
