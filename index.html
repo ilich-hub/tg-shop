@@ -1,176 +1,254 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Food Store</title>
+<title>Premium Food</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
-:root {
-  --red: #d62828;
-  --dark: #1c1c1c;
-  --bg: #f6f6f6;
+:root{
+  --primary:#8b1d1d;
+  --bg:#f4f4f4;
+  --dark:#111;
 }
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  background: var(--bg);
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+  background:var(--bg);
+  color:var(--dark);
 }
 
-header {
-  background: var(--red);
-  color: white;
-  text-align: center;
-  padding: 16px;
-  font-size: 22px;
-  font-weight: 600;
+header{
+  background:var(--primary);
+  color:#fff;
+  padding:16px;
+  text-align:center;
+  font-size:20px;
+  font-weight:600;
 }
 
-.products {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  padding: 12px;
+/* SCREENS */
+.screen{display:none}
+.screen.active{display:block}
+
+/* CATALOG */
+.products{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+  padding:12px;
 }
 
-.card {
-  background: white;
-  border-radius: 18px;
-  overflow: hidden;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+.card{
+  background:#fff;
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow:0 8px 24px rgba(0,0,0,.08);
 }
 
-.card img {
-  width: 100%;
-  height: 120px;
-  object-fit: cover;
+.card img{
+  width:100%;
+  height:120px;
+  object-fit:cover;
 }
 
-.card-content {
-  padding: 10px;
+.card-body{
+  padding:10px;
 }
 
-.card h4 {
-  margin: 0;
-  font-size: 15px;
+.card-body h4{
+  margin:0;
+  font-size:15px;
 }
 
-.card p {
-  margin: 6px 0 0;
-  color: var(--red);
-  font-weight: 600;
+.price{
+  margin-top:6px;
+  color:var(--primary);
+  font-weight:600;
 }
 
-/* MODAL */
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  display: none;
-  align-items: center;
-  justify-content: center;
+/* BUTTONS */
+button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:18px;
+  background:var(--primary);
+  color:#fff;
+  font-size:16px;
+  margin-top:12px;
 }
 
-.modal-box {
-  background: white;
-  width: 90%;
-  border-radius: 20px;
-  overflow: hidden;
+/* PRODUCT SCREEN */
+.product-img{
+  width:100%;
+  height:220px;
+  object-fit:cover;
 }
 
-.modal-box img {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
+.product-content{
+  padding:16px;
 }
 
-.modal-content {
-  padding: 16px;
+.qty{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  margin-top:10px;
 }
 
-.modal-content h3 {
-  margin: 0;
+.qty button{
+  width:40px;
+  height:40px;
+  border-radius:12px;
+  padding:0;
 }
 
-.modal-content p {
-  color: #555;
+/* CART */
+.cart-item{
+  background:#fff;
+  margin:10px;
+  padding:12px;
+  border-radius:16px;
+  box-shadow:0 6px 18px rgba(0,0,0,.07);
 }
 
-button {
-  width: 100%;
-  padding: 14px;
-  border: none;
-  border-radius: 14px;
-  background: var(--red);
-  color: white;
-  font-size: 16px;
-  margin-top: 12px;
+.cart-item h4{margin:0}
+.cart-total{
+  padding:16px;
+  font-weight:600;
 }
 </style>
 </head>
 
 <body>
 
-<header>🍽 Premium Food Store</header>
+<header id="header">🍽 Premium Food</header>
 
-<div class="products" id="products"></div>
+<!-- CATALOG -->
+<div id="catalog" class="screen active">
+  <div class="products" id="products"></div>
+</div>
 
-<!-- MODAL -->
-<div class="modal" id="modal">
-  <div class="modal-box">
-    <img id="modalImg">
-    <div class="modal-content">
-      <h3 id="modalTitle"></h3>
-      <p id="modalDesc"></p>
-      <p id="modalPrice" style="color:#d62828;font-weight:600"></p>
-      <button onclick="order()">Заказать</button>
-      <button onclick="closeModal()" style="background:#ccc;color:#000">Закрыть</button>
+<!-- PRODUCT -->
+<div id="product" class="screen">
+  <img id="pImg" class="product-img">
+  <div class="product-content">
+    <h2 id="pName"></h2>
+    <p id="pDesc"></p>
+    <p class="price" id="pPrice"></p>
+
+    <div class="qty">
+      <button onclick="changeQty(-1)">−</button>
+      <span id="qty">1</span>
+      <button onclick="changeQty(1)">+</button>
     </div>
+
+    <button onclick="addToCart()">Добавить в корзину</button>
+    <button onclick="goCatalog()" style="background:#ccc;color:#000">Назад</button>
   </div>
+</div>
+
+<!-- CART -->
+<div id="cart" class="screen">
+  <div id="cartItems"></div>
+  <div class="cart-total" id="cartTotal"></div>
+  <button onclick="checkout()">Оформить заказ</button>
+  <button onclick="goCatalog()" style="background:#ccc;color:#000">Назад</button>
 </div>
 
 <script>
 const tg = Telegram.WebApp;
+tg.expand();
 
 const products = Array.from({length:50},(_,i)=>({
-  name:`Продукт ${i+1}`,
-  price:`${(i+1)*3000} сум`,
-  desc:`Свежий и качественный продукт №${i+1}. Подходит для здорового питания.`,
-  img:`https://picsum.photos/300/200?food=${i}`
+  id:i,
+  name:`Блюдо ${i+1}`,
+  desc:`Премиум блюдо №${i+1}, свежие ингредиенты.`,
+  price:30000 + i*1500,
+  img:`https://picsum.photos/400/300?food=${i}`
 }));
 
-const container = document.getElementById("products");
+let currentProduct = null;
+let quantity = 1;
+let cart = [];
 
-products.forEach((p,i)=>{
-  container.innerHTML += `
-    <div class="card" onclick="openModal(${i})">
+const screens = {
+  catalog:document.getElementById("catalog"),
+  product:document.getElementById("product"),
+  cart:document.getElementById("cart")
+};
+
+function show(name){
+  Object.values(screens).forEach(s=>s.classList.remove("active"));
+  screens[name].classList.add("active");
+  document.getElementById("header").innerText =
+    name==="catalog"?"🍽 Premium Food":
+    name==="cart"?"🛒 Корзина":"🍽 Детали";
+}
+
+function goCatalog(){show("catalog")}
+function goCart(){renderCart();show("cart")}
+
+const productsBox = document.getElementById("products");
+products.forEach(p=>{
+  productsBox.innerHTML += `
+    <div class="card" onclick="openProduct(${p.id})">
       <img src="${p.img}">
-      <div class="card-content">
+      <div class="card-body">
         <h4>${p.name}</h4>
-        <p>${p.price}</p>
+        <div class="price">${p.price} сум</div>
       </div>
     </div>
   `;
 });
 
-let current;
-
-function openModal(i){
-  current = products[i];
-  modal.style.display="flex";
-  modalImg.src=current.img;
-  modalTitle.innerText=current.name;
-  modalDesc.innerText=current.desc;
-  modalPrice.innerText=current.price;
+function openProduct(id){
+  currentProduct = products.find(p=>p.id===id);
+  quantity = 1;
+  document.getElementById("qty").innerText = quantity;
+  pImg.src = currentProduct.img;
+  pName.innerText = currentProduct.name;
+  pDesc.innerText = currentProduct.desc;
+  pPrice.innerText = currentProduct.price + " сум";
+  show("product");
 }
 
-function closeModal(){
-  modal.style.display="none";
+function changeQty(v){
+  quantity = Math.max(1, quantity+v);
+  document.getElementById("qty").innerText = quantity;
 }
 
-function order(){
-  tg.sendData(current.name);
+function addToCart(){
+  const item = cart.find(i=>i.id===currentProduct.id);
+  if(item) item.qty += quantity;
+  else cart.push({...currentProduct, qty:quantity});
+  goCart();
+}
+
+function renderCart(){
+  const box = document.getElementById("cartItems");
+  box.innerHTML = "";
+  let total = 0;
+
+  cart.forEach(i=>{
+    total += i.price * i.qty;
+    box.innerHTML += `
+      <div class="cart-item">
+        <h4>${i.name}</h4>
+        <p>${i.qty} × ${i.price} сум</p>
+      </div>
+    `;
+  });
+
+  cartTotal.innerText = "Итого: " + total + " сум";
+}
+
+function checkout(){
+  tg.sendData(JSON.stringify(cart));
   tg.close();
 }
 </script>
