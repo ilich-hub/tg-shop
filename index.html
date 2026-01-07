@@ -1,52 +1,179 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Магазин</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <style>
-    body { font-family: Arial; background: #f5f5f5; margin: 0; }
-    h1 { text-align: center; }
-    .product {
-      background: white;
-      margin: 10px;
-      padding: 10px;
-      border-radius: 10px;
-    }
-    img { width: 100%; border-radius: 10px; }
-    button {
-      width: 100%;
-      padding: 10px;
-      background: #2a9df4;
-      color: white;
-      border: none;
-      border-radius: 8px;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Food Store</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+:root {
+  --red: #d62828;
+  --dark: #1c1c1c;
+  --bg: #f6f6f6;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+}
+
+header {
+  background: var(--red);
+  color: white;
+  text-align: center;
+  padding: 16px;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.products {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  padding: 12px;
+}
+
+.card {
+  background: white;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.card img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+}
+
+.card-content {
+  padding: 10px;
+}
+
+.card h4 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.card p {
+  margin: 6px 0 0;
+  color: var(--red);
+  font-weight: 600;
+}
+
+/* MODAL */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-box {
+  background: white;
+  width: 90%;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.modal-box img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.modal-content {
+  padding: 16px;
+}
+
+.modal-content h3 {
+  margin: 0;
+}
+
+.modal-content p {
+  color: #555;
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 14px;
+  background: var(--red);
+  color: white;
+  font-size: 16px;
+  margin-top: 12px;
+}
+</style>
 </head>
 
 <body>
-  <h1>🛒 Магазин</h1>
 
-  <div class="product">
-    <img src="https://picsum.photos/300/200?1">
-    <h3>Товар 1</h3>
-    <p>Цена: 50 000 сум</p>
-    <button onclick="order('Товар 1')">Заказать</button>
+<header>🍽 Premium Food Store</header>
+
+<div class="products" id="products"></div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <img id="modalImg">
+    <div class="modal-content">
+      <h3 id="modalTitle"></h3>
+      <p id="modalDesc"></p>
+      <p id="modalPrice" style="color:#d62828;font-weight:600"></p>
+      <button onclick="order()">Заказать</button>
+      <button onclick="closeModal()" style="background:#ccc;color:#000">Закрыть</button>
+    </div>
   </div>
+</div>
 
-  <div class="product">
-    <img src="https://picsum.photos/300/200?2">
-    <h3>Товар 2</h3>
-    <p>Цена: 80 000 сум</p>
-    <button onclick="order('Товар 2')">Заказать</button>
-  </div>
+<script>
+const tg = Telegram.WebApp;
 
-  <script>
-    function order(product) {
-      Telegram.WebApp.sendData(product);
-      Telegram.WebApp.close();
-    }
-  </script>
+const products = Array.from({length:50},(_,i)=>({
+  name:`Продукт ${i+1}`,
+  price:`${(i+1)*3000} сум`,
+  desc:`Свежий и качественный продукт №${i+1}. Подходит для здорового питания.`,
+  img:`https://picsum.photos/300/200?food=${i}`
+}));
+
+const container = document.getElementById("products");
+
+products.forEach((p,i)=>{
+  container.innerHTML += `
+    <div class="card" onclick="openModal(${i})">
+      <img src="${p.img}">
+      <div class="card-content">
+        <h4>${p.name}</h4>
+        <p>${p.price}</p>
+      </div>
+    </div>
+  `;
+});
+
+let current;
+
+function openModal(i){
+  current = products[i];
+  modal.style.display="flex";
+  modalImg.src=current.img;
+  modalTitle.innerText=current.name;
+  modalDesc.innerText=current.desc;
+  modalPrice.innerText=current.price;
+}
+
+function closeModal(){
+  modal.style.display="none";
+}
+
+function order(){
+  tg.sendData(current.name);
+  tg.close();
+}
+</script>
+
 </body>
 </html>
