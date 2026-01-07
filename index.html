@@ -21,12 +21,20 @@
 body{
   margin:0;
   font-family:'Inter',sans-serif;
-  background:linear-gradient(180deg,var(--bg1),var(--bg2));
+  background:#fff;
   padding-bottom:90px;
 }
 
-.screen{display:none;animation:fade .25s ease}
-.screen.active{display:block}
+.screen{
+  display:none;
+  min-height:100vh;
+  background:linear-gradient(180deg,var(--bg1),var(--bg2));
+  animation:fade .25s ease;
+}
+
+.screen.active{
+  display:block;
+}
 
 @keyframes fade{
   from{opacity:0;transform:translateY(8px)}
