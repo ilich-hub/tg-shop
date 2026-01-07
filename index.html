@@ -38,10 +38,14 @@ body{
   display:block;
 }
 
-  #favorites,
-#cart{
+  #cart{
   display:flex;
   flex-direction:column;
+}
+
+/* ⛔ favorites НЕ flex */
+#favorites{
+  display:block;
 }
   
 @keyframes fade{
@@ -104,6 +108,11 @@ body{
   gap:16px;
   padding:20px;
 }
+
+  #favorites .products{
+  display:grid;
+  }
+  
 .card{
   background:var(--card);
   border-radius:22px;
@@ -388,12 +397,23 @@ function show(id){
 }
 
 function nav(id){
- show(id);
- document.querySelectorAll(".bottom-nav button").forEach(b=>b.classList.remove("active"));
- document.getElementById("nav-"+(id==="favorites"?"fav":id)).classList.add("active");
+  show(id);
 
- if(id==="favorites") renderFavorites();
- if(id==="cart") renderCart();
+  // активная кнопка
+  document.querySelectorAll(".bottom-nav button")
+    .forEach(b => b.classList.remove("active"));
+
+  document.getElementById("nav-"+(id==="favorites"?"fav":id))
+    .classList.add("active");
+
+  // 🔥 ШАГ 4 — ПЕРЕРИСОВКА ЭКРАНОВ
+  if(id === "favorites"){
+    renderFavorites();
+  }
+
+  if(id === "cart"){
+    renderCart();
+  }
 }
 
 /* INIT */
